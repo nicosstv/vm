@@ -1,0 +1,19 @@
+{
+    "name": "vtex/magento",
+    "description": "A module that allows VTEX marketplaces to sell products from an external magento seller",
+    "type": "magento2-module",
+    "version": "1.0.0",
+    "license": [
+        "OSL-3.0",
+        "AFL-3.0"
+    ],
+    "require": {
+        "php": ">=7.1.3"
+    },
+    "autoload": {
+        "files": [ "registration.php" ],
+        "psr-4": {
+            "Vtex\\VtexMagento\\": ""
+        }
+    }
+}

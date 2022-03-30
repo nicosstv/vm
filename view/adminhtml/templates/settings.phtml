@@ -1,0 +1,248 @@
+<?php /** @var Vtex\VtexMagento\Block\Setting $block */
+
+use Magento\Framework\App\ObjectManager; ?>
+<?php /** @var Vtex\VtexMagento\Model\Settings */ ?>
+<?php
+    $settings = $block->getSettings();
+    $logs = $block->getImportLogs();
+    $mappings = $block->getMappings()->getData();
+    $payment_methods_mappings = $block->getPaymentMethodsMappings()->getData();
+    $categories = $block->getCategories();
+    $payment_methods = $block->getPaymentMethods();
+    $running = [
+        'Brands import' => false,
+        'Categories import' => false,
+        'Products import' => false,
+        'Payment methods import' => false
+    ];
+?>
+
+<form action="<?php echo $block->getPostUrl() ?>" method="POST">
+    <input type="hidden" name="settings_id" value="<?= $settings['settings_id']; ?>" />
+    <input name="form_key" type="hidden" value="<?php /* @escapeNotVerified */ echo $block->getFormKey() ?>" />
+    <div class="admin__field field field-username required _required">
+        <label class="label admin__field-label" for="vendor_name">
+            <span>Vendor name</span>
+        </label>
+        <div class="admin__field-control control">
+            <input class="input-text admin__control-text required-entry _required" type="text" id="vendor_name" name="vendor_name" value="<?= $settings['vendor_name']; ?>" />
+        </div>
+    </div>
+    <div class="admin__field field field-username required _required">
+        <label class="label admin__field-label" for="app_key">
+            <span>App key</span>
+        </label>
+        <div class="admin__field-control control">
+            <input class="input-text admin__control-text required-entry _required" type="text" id="app_key" name="app_key" value="<?= $settings['app_key']; ?>" />
+        </div>
+    </div>
+    <div class="admin__field field field-username required _required">
+        <label class="label admin__field-label" for="app_token">
+            <span>App token</span>
+        </label>
+        <div class="admin__field-control control">
+            <input class="input-text admin__control-text required-entry _required" type="text" id="app_token" name="app_token" value="<?= $settings['app_token']; ?>" />
+        </div>
+    </div>
+
+    <div class="admin__field field field-username required _required">
+        <label class="label admin__field-label" for="seller_id">
+            <span>Seller ID</span>
+        </label>
+        <div class="admin__field-control control">
+            <input class="input-text admin__control-text required-entry _required" type="text" id="seller_id" name="seller_id" value="<?= $settings['seller_id']; ?>" />
+        </div>
+    </div>
+
+    <div class="admin__field field field-username">
+        <label class="label admin__field-label" for="vtex_aut_cookie">
+            <span>VtexIdClientAutCookie</span>
+        </label>
+        <div class="admin__field-control control">
+            <input class="input-text admin__control-text required-entry _required" type="text" id="vtex_aut_cookie" name="vtex_aut_cookie" value="<?= $settings['vtex_aut_cookie']; ?>" />
+        </div>
+    </div>
+
+    <div class="admin__field field field-username">
+        <label class="label admin__field-label" for="salesChannel">
+            <span>Sales Channel</span>
+        </label>
+        <div class="admin__field-control control">
+            <input class="input-text admin__control-text required-entry _required" type="text" id="salesChannel" name="salesChannel" value="<?= $settings['salesChannel'] ? $settings['salesChannel'] : '1'; ?>" />
+        </div>
+    </div>
+
+    <div class="admin__field field field-checkbox">
+        <label class="label admin__field-label" for="catalog_v2">
+            <span>Use Catalog V2?</span>
+        </label>
+        <div class="admin__field-control control">
+            <input class="checkbox" type="checkbox" id="catalog_v2" name="catalog_v2" value="<?= $settings['catalog_v2']; ?>" <?= $settings['catalog_v2'] ? 'checked' : '' ?> />
+        </div>
+    </div>
+
+    <div style="margin-top:20px">
+        <button id="save" title="Save settings" type="submit" class="action-default scalable save primary ui-button ui-widget ui-state-default ui-corner-all ui-button-text-only" role="button" aria-disabled="false">
+            <span class="ui-button-text">
+                <span>Save settings</span>
+            </span>
+        </button>
+    </div>
+
+</form>
+
+<?php if(!empty($settings['vendor_name']) && !empty($settings['app_key']) && !empty($settings['app_token']) && !empty($settings['seller_id'])): ?>
+<br>
+<div class="table-wrapper import-logs" data-role="grid-wrapper">
+    <table class="data-grid data-grid-draggable" data-role="grid">
+        <thead>
+            <tr>
+                <th style="padding: 1rem 1rem;" scope="col" class="data-row"><?php echo __('ID') ?></th>
+                <th style="padding: 1rem 1rem;" scope="col" class="data-row"><?php echo __('Type') ?></th>
+                <th style="padding: 1rem 1rem;" scope="col" class="data-row"><?php echo __('Status') ?></th>
+                <th style="padding: 1rem 1rem;" scope="col" class="data-row"><?php echo __('Progress') ?></th>
+                <th style="padding: 1rem 1rem;" scope="col" class="data-row"><?php echo __('Errors') ?></th>
+                <th style="padding: 1rem 1rem;" scope="col" class="data-row"><?php echo __('Log file') ?></th>
+                <th style="padding: 1rem 1rem;" scope="col" class="data-row"><?php echo __('Created At') ?></th>
+            </tr>
+        </thead>
+        <tbody>
+        <?php
+        foreach ($logs as $item): ?>
+            <?php if ($item->getStatus() == 'In progress') {
+                $running[$item->getType()] = true;
+            } ?>
+            <tr class="data-row">
+                <td data-th="<?= $block->escapeHtml(__('ID')) ?>" class="col id">
+                    <?php echo $item->getId() ?>
+                </td>
+                <td data-th="<?= $block->escapeHtml(__('Type')) ?>" class="col type">
+                    <?php echo $item->getType() ?>
+                </td>
+                <td data-th="<?= $block->escapeHtml(__('Status')) ?>" class="col status">
+                    <?php echo $item->getStatus() ?>
+                </td>
+                <td data-th="<?= $block->escapeHtml(__('Progress')) ?>" class="col progress">
+                    <?php echo $item->getProgress() .'/'. $item->getTotal() ?>
+                </td>
+                <td data-th="<?= $block->escapeHtml(__('Errors')) ?>" class="col errors">
+                    <?php echo $item->getErrors() ?>
+                </td>
+                <td data-th="<?= $block->escapeHtml(__('Log file')) ?>" class="col filename">
+                    <a href="<?= $this->getUrl('vtexmagento/settings/downloadLog', ['id' => $item->getId()]) ?>"><?php echo $item->getFilename() ?></a>
+                </td>
+                <td data-th="<?= $block->escapeHtml(__('Created At')) ?>" class="col date">
+                    <?php echo $item->getDate() ?>
+                </td>
+            </tr>
+        <?php endforeach; ?>
+        </tbody>
+        <caption class="table-caption">
+
+            <?php if($settings['catalog_v2']): ?>
+                <?php if(!$mappings): ?>
+                    <a <?= $running['Categories import'] ? 'disabled' : '' ?> href="<?= $running['Categories import'] ? 'javascript:void(0);' : $this->getUrl('vtexmagento/settings/generateCategoriesMappings') ?>" class="action-default scalable save primary ui-button ui-widget ui-state-default ui-corner-all ui-button-text-only" role="button" aria-disabled="false"><?= $running['Categories import'] ? 'Generating categories mapping' : 'Generate categories mapping' ?></a>
+                <?php endif; ?>
+            <?php else: ?>
+                <a <?= $running['Categories import'] ? 'disabled' : '' ?> href="<?= $running['Categories import'] ? 'javascript:void(0);' : $this->getUrl('vtexmagento/settings/importCategories') ?>" class="action-default scalable save primary ui-button ui-widget ui-state-default ui-corner-all ui-button-text-only" role="button" aria-disabled="false"><?= $running['Categories import'] ? 'Categories import in progress' : 'Start categories import' ?></a>
+            <?php endif; ?>
+
+            <a <?= $running['Brands import'] ? 'disabled' : '' ?>  href="<?= $running['Brands import'] ? 'javascript:void(0);' : $this->getUrl('vtexmagento/settings/importBrands') ?>" class="action-default scalable save primary ui-button ui-widget ui-state-default ui-corner-all ui-button-text-only" role="button" aria-disabled="false"><?= $running['Brands import'] ? 'Brands import in progress' : 'Start brands import' ?></a>
+            <a <?= $running['Products import'] ? 'disabled' : '' ?>  href="<?= $running['Products import'] ? 'javascript:void(0);' : $this->getUrl('vtexmagento/settings/importProducts') ?>" class="action-default scalable save primary ui-button ui-widget ui-state-default ui-corner-all ui-button-text-only" role="button" aria-disabled="false"><?= $running['Products import'] ? 'Products import in progress' : 'Start products import' ?></a>
+
+            <?php if(!$payment_methods_mappings && !$settings['catalog_v2']) : ?>
+                <a <?= $running['Payment methods import'] ? 'disabled' : '' ?> href="<?= $running['Payment methods import'] ? 'javascript:void(0);' : $this->getUrl('vtexmagento/settings/generatePaymentMethodsMappings') ?>" class="action-default scalable save primary ui-button ui-widget ui-state-default ui-corner-all ui-button-text-only" role="button" aria-disabled="false"><?= $running['Payment methods import'] ? 'Generating payment methods mapping' : 'Generate payment methods mapping' ?></a>
+            <?php endif; ?>
+        </caption>
+    </table>
+</div>
+<?php endif; ?>
+
+<?php if($payment_methods_mappings) : ?>
+    <br>
+    <hr>
+    <form action="<?= $block->getSavePaymentMethodsMappingsUrl() ?>" method="POST">
+        <input name="form_key" type="hidden" value="<?php /* @escapeNotVerified */ echo $block->getFormKey() ?>" />
+
+        <div style="margin-top:20px; margin-bottom: 20px;">
+            <button id="save-payment-methods-mappings" title="Save payment methods mappings" type="submit" class="action-default scalable save primary ui-button ui-widget ui-state-default ui-corner-all ui-button-text-only" role="button" aria-disabled="false">
+                <span class="ui-button-text">
+                    <span>Save payment methods mappings</span>
+                </span>
+            </button>
+        </div>
+
+        <div class="table-wrapper import-logs" data-role="grid-wrapper">
+            <table class="data-grid data-grid-draggable" data-role="grid">
+                <thead>
+                    <tr>
+                        <th style="padding: 1rem 1rem;" scope="col" class="data-row"><?php echo __('VTEX Payment Method') ?></th>
+                        <th style="padding: 1rem 1rem;" scope="col" class="data-row"><?php echo __('Magento Payment Method') ?></th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <?php foreach ($payment_methods_mappings as $mapping): ?>
+                        <tr class="data-row">
+                            <td><?= $mapping['vtex_name'] ?></td>
+                            <td>
+                                <?= sprintf(
+                                    '<select name="payment_methods_mapping[%s]" class="admin__control-select">%s</select>', $mapping['id'], $block->paymentOptions($payment_methods, $mapping['magento_name'])
+                                ) ?>
+                            </td>
+                        </tr>
+                    <?php endforeach; ?>
+                </tbody>
+            </table>
+        </div>
+    </form>
+<?php endif; ?>
+
+<?php if($mappings): ?>
+    <br>
+    <hr>
+    <form action="<?= $block->getSaveMappingsUrl() ?>" method="POST">
+        <input name="form_key" type="hidden" value="<?php /* @escapeNotVerified */ echo $block->getFormKey() ?>" />
+
+        <div style="margin-top:20px; margin-bottom: 20px;">
+            <button id="save-mappings" title="Save mappings" type="submit" class="action-default scalable save primary ui-button ui-widget ui-state-default ui-corner-all ui-button-text-only" role="button" aria-disabled="false">
+                <span class="ui-button-text">
+                    <span>Save mappings</span>
+                </span>
+            </button>
+        </div>
+
+        <div class="table-wrapper import-logs" data-role="grid-wrapper">
+
+            <table class="data-grid data-grid-draggable" data-role="grid">
+
+                <thead>
+                    <tr>
+                        <th style="padding: 1rem 1rem;" scope="col" class="data-row"><?php echo __('VTEX Category') ?></th>
+                        <th style="padding: 1rem 1rem;" scope="col" class="data-row"><?php echo __('Magento Category') ?></th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <?php foreach ($mappings as $mapping): ?>
+                        <tr class="data-row">
+                            <td><?= $mapping['vtex_name'] ?></td>
+                            <td>
+                                <?= sprintf(
+                                    '<select name="mapping[%s]" class="admin__control-select">%s</select>', $mapping['id'], $block->options($categories, $mapping['magento_id'])
+                                ) ?>
+                            </td>
+                        </tr>
+                    <?php endforeach; ?>
+                </tbody>
+            </table>
+
+        </div>
+
+        <div style="margin-top:20px">
+            <button id="save-mappings" title="Save mappings" type="submit" class="action-default scalable save primary ui-button ui-widget ui-state-default ui-corner-all ui-button-text-only" role="button" aria-disabled="false">
+                <span class="ui-button-text">
+                    <span>Save mappings</span>
+                </span>
+            </button>
+        </div>
+    </form>
+<?php endif; ?>

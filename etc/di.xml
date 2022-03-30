@@ -1,0 +1,14 @@
+<?xml version="1.0"?>
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:framework:ObjectManager/etc/config.xsd">
+    <type name="Magento\Framework\Console\CommandList">
+        <arguments>
+            <argument name="commands" xsi:type="array">
+                <item name="vtexImportBrands" xsi:type="object">Vtex\VtexMagento\Console\Brands</item>
+                <item name="vtexImportCategories" xsi:type="object">Vtex\VtexMagento\Console\Categories</item>
+                <item name="vtexImportProducts" xsi:type="object">Vtex\VtexMagento\Console\Products</item>
+            </argument>
+        </arguments>
+    </type>
+    <preference for="Vtex\VtexMagento\Api\OrderInterface" type="Vtex\VtexMagento\Model\Order"/>
+    <preference for="Vtex\VtexMagento\Api\VtexCatalogInterface" type="Vtex\VtexMagento\Model\VtexCatalog"/>
+</config>

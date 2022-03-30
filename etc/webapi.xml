@@ -1,0 +1,45 @@
+<?xml version="1.0"?>
+<routes xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Webapi:etc/webapi.xsd">
+    <route method="GET" url="/V2/orders/get/:id">
+        <service class="Vtex\VtexMagento\Api\OrderInterface" method="getOrder"/>
+        <resources>
+            <resource ref="self"/>
+        </resources>
+    </route>
+
+    <route method="POST" url="/fulfillment/pvt/orders">
+        <service class="Vtex\VtexMagento\Api\OrderInterface" method="createOrder"/>
+        <resources>
+            <resource ref="self"/>
+        </resources>
+    </route>
+
+    <route method="POST" url="/fulfillment/pvt/orders/:id/cancel">
+        <service class="Vtex\VtexMagento\Api\OrderInterface" method="cancelOrder"/>
+        <resources>
+            <resource ref="self"/>
+        </resources>
+    </route>
+
+    <route method="POST" url="/fulfillment/pvt/orderForms/simulation">
+        <service class="Vtex\VtexMagento\Api\VtexCatalogInterface" method="simulation"/>
+        <resources>
+            <resource ref="self"/>
+        </resources>
+    </route>
+
+    <route method="POST" url="/fulfillment/pvt/orders/:id/fulfill">
+        <service class="Vtex\VtexMagento\Api\OrderInterface" method="fulfilOrder"/>
+        <resources>
+            <resource ref="self"/>
+        </resources>
+    </route>
+
+    <route url="/fulfillment/mgt/invoices/:id" method="GET">
+        <service class="Magento\Sales\Api\InvoiceRepositoryInterface" method="get"/>
+        <resources>
+            <resource ref="anonymous" />
+        </resources>
+    </route>
+</routes>

@@ -1,0 +1,7 @@
+<?xml version="1.0"?>
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Backend:etc/menu.xsd">
+    <menu>
+        <add id="Vtex_VtexMagento::mainvtex" title="VTEX" translate="title" module="Vtex_VtexMagento" parent="Magento_Backend::content" sortOrder="50" dependsOnModule="Vtex_VtexMagento" resource="Vtex_VtexMagento::mainvtex"/>
+        <add id="Vtex_VtexMagento::mainvtex_settings" title="Settings" translate="title" module="Vtex_VtexMagento" parent="Vtex_VtexMagento::mainvtex" sortOrder="10" dependsOnModule="Vtex_VtexMagento" action="vtexmagento/settings" resource="Vtex_VtexMagento::mainvtex"/>
+    </menu>
+</config>
